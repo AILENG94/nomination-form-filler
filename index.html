@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nomination Form Filler</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f7a62">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nomination">
+<script>
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
+
 <style>
 :root{
   --bg:#f4f6f5; --card:#ffffff; --ink:#1d2a26; --muted:#5d6b66; --line:#dfe5e2;
@@ -90,6 +100,7 @@ aside .card{margin-bottom:12px}
 <header>
   <div class="hwrap">
     <h1>Nomination Form Filler <small>Appointment / Change of Nominee(s) / Trustee(s) — NBZ-FNOMI-V07-082025</small></h1>
+    <button class="btn primary hide" id="btnInstall" title="Add this app to your device with its own icon">Install app</button>
     <button class="btn" id="btnNew" title="Clear all fields">New</button>
     <button class="btn" id="btnLoad" title="Open a saved customer file">Open customer…</button>
     <button class="btn" id="btnSave" title="Save these details as a file to reuse later">Save customer</button>
@@ -1641,6 +1652,12 @@ $('fileNomIC').onchange = async (e) => {
     status('nomStatus', `Added nominee ${n} from "${file.name}" — fill in Relationship and Share, then click Read nominees.`);
   } catch (err) { status('nomStatus', err.message || String(err), true); }
 };
+
+// ---------- install as an app (browsers that support it fire beforeinstallprompt) ----------
+let installPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installPrompt = e; $('btnInstall').classList.remove('hide'); });
+window.addEventListener('appinstalled', () => { installPrompt = null; $('btnInstall').classList.add('hide'); });
+$('btnInstall').onclick = async () => { if (!installPrompt) return; installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; $('btnInstall').classList.add('hide'); };
 
 render();
 </script>
